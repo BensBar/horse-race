@@ -1,243 +1,548 @@
-/* =========================================================
-   Horse Race – styles.css
-   Responsive layout targeting iPhone Safari through 4K TVs.
-   ========================================================= */
+/* ==========================================================================
+   Golden Cup Classic — styles.css
+   Premium broadcast-quality horse racing game.
+   Responsive: iPhone Safari → 4K TV.
+   ========================================================================== */
 
-/* ── Reset & base ──────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+/* ── CSS Custom Properties ─────────────────────────────────────────────── */
+:root {
+  /* Palette */
+  --bg-primary:      #0a0e1a;
+  --bg-surface:      #111627;
+  --bg-card:         #181d30;
+  --text-primary:    #f0f0f5;
+  --text-muted:      #8890a8;
+  --gold:            #ffd700;
+  --gold-dark:       #b8960f;
+  --accent:          #e63946;
+  --grass-dark:      #1a4d1a;
+  --grass-light:     #2a6e2a;
+  --dirt:            #8b7355;
+  --dirt-dark:       #6b5540;
+  --dirt-light:      #a08868;
+  --rail-color:      #c0c0c0;
+
+  /* Sizing */
+  --lane-h:          clamp(50px, 8vw, 80px);
+  --horse-w:         clamp(36px, 5vw, 56px);
+  --horse-h:         clamp(24px, 3.5vw, 38px);
+  --badge-size:      clamp(22px, 3vw, 36px);
+  --bar-h:           clamp(36px, 5vw, 56px);
+  --finish-pos:      92%;
+
+  /* Timing */
+  --transition-fast: 0.18s;
+  --transition-med:  0.35s;
+  --transition-slow: 0.6s;
 }
 
-html {
-  font-size: 16px; /* base; scaled up with clamp() below */
-}
-
+/* ── Reset ─────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: #1a1a2e;
-  color: #eee;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: clamp(0.75rem, 3vw, 3rem);
-  gap: clamp(1rem, 3vw, 2rem);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+               'Helvetica Neue', Arial, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button { font: inherit; cursor: pointer; border: none; background: none; color: inherit; }
+ol, ul { list-style: none; }
+
+/* ── Screen Utility ────────────────────────────────────────────────────── */
+.screen {
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column;
+  transition: opacity var(--transition-slow) ease, visibility var(--transition-slow);
+  z-index: 1;
+}
+.screen--hidden {
+  opacity: 0; visibility: hidden; pointer-events: none;
 }
 
-/* ── Header ────────────────────────────────────────────── */
-header {
-  width: 100%;
-  max-width: 1400px;
-  text-align: center;
-}
-
-h1 {
-  font-size: clamp(1.8rem, 5vw, 4rem);
-  letter-spacing: 0.05em;
-  text-shadow: 0 0 20px rgba(255, 200, 0, 0.6);
-}
-
-/* ── Main content wrapper ──────────────────────────────── */
-main {
-  width: 100%;
-  max-width: 1400px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
-}
-
-/* ── Track container ───────────────────────────────────── */
-#track-container {
-  position: relative;
-  width: 100%;
-  background: linear-gradient(135deg, #2d5a1b 0%, #3a7a25 50%, #2d5a1b 100%);
-  border: 4px solid #8b6914;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
-              inset 0 0 40px rgba(0, 0, 0, 0.2);
-}
-
-/* ── Finish line ───────────────────────────────────────── */
-/*
-   The finish line is an absolutely positioned element
-   pinned to the right side of the track.
-   A repeating checkerboard pattern is achieved with a CSS
-   background gradient.
-*/
-#finish-line {
-  position: absolute;
-  top: 0;
-  right: clamp(40px, 6%, 90px);
-  width: clamp(8px, 1.2vw, 18px);
-  height: 100%;
-  background-image: repeating-conic-gradient(
-    #000 0% 25%,
-    #fff 25% 50%
-  );
-  background-size: 12px 12px;
+/* ══════════════════════════════════════════════════════════════════════════
+   PRE-RACE SCREEN
+   ══════════════════════════════════════════════════════════════════════ */
+#pre-race {
+  background:
+    radial-gradient(ellipse at 50% 20%, rgba(255,215,0,.08) 0%, transparent 60%),
+    linear-gradient(180deg, #0f1525 0%, var(--bg-primary) 100%);
+  align-items: center; justify-content: center;
+  padding: clamp(1rem, 4vw, 3rem);
+  overflow-y: auto;
   z-index: 10;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+.pre-race__inner {
+  width: 100%; max-width: 900px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(1.2rem, 3vw, 2.5rem);
+}
+.pre-race__header { text-align: center; }
+.pre-race__badge {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff; font-weight: 800;
+  font-size: clamp(.6rem, 1.4vw, .85rem);
+  letter-spacing: .18em; text-transform: uppercase;
+  padding: .25em .9em; border-radius: 4px;
+  margin-bottom: .6rem;
+}
+.pre-race__title {
+  font-size: clamp(1.8rem, 6vw, 4rem);
+  font-weight: 900; letter-spacing: .03em;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(255,215,0,.35), 0 2px 0 var(--gold-dark);
+  line-height: 1.15;
+}
+.pre-race__subtitle {
+  color: var(--text-muted);
+  font-size: clamp(.8rem, 2vw, 1.1rem);
+  margin-top: .3em;
+  letter-spacing: .08em; text-transform: uppercase;
 }
 
-/* ── Individual lane ───────────────────────────────────── */
-.lane {
-  position: relative;
-  display: flex;
-  align-items: center;
-  height: clamp(50px, 8vw, 110px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-  padding: 0 0.5rem;
-}
-
-.lane:last-child {
-  border-bottom: none;
-}
-
-/* Alternate lane shading for readability */
-.lane:nth-child(odd) {
-  background: rgba(255, 255, 255, 0.04);
-}
-
-/* ── Lane number badge ─────────────────────────────────── */
-.lane-number {
-  flex-shrink: 0;
-  width: clamp(24px, 3vw, 48px);
-  height: clamp(24px, 3vw, 48px);
-  line-height: clamp(24px, 3vw, 48px);
-  text-align: center;
-  font-weight: bold;
-  font-size: clamp(0.75rem, 2vw, 1.5rem);
-  background: rgba(0, 0, 0, 0.4);
-  border-radius: 50%;
-  color: #ffd700;
-  margin-right: 0.5rem;
-  z-index: 5;
-  position: relative;
-}
-
-/* ── Horse emoji ───────────────────────────────────────── */
-/*
-   Each horse is absolutely positioned inside its lane and
-   translated along the X axis by game.js.
-   The left offset accounts for the lane-number badge width
-   so the horse starts just after the badge.
-*/
-.horse {
-  position: absolute;
-  left: 0;
-  /* translateX is set dynamically by game.js */
-  font-size: clamp(1.8rem, 5vw, 5rem);
-  line-height: 1;
-  /* Subtle trotting bob via CSS animation */
-  animation: trot 0.35s steps(2) infinite paused;
-  transform-origin: center bottom;
-  z-index: 5;
-  user-select: none;
-  will-change: transform;
-  transition: filter 0.3s;
-}
-
-/* Trot bob animation (running once race starts via JS class) */
-@keyframes trot {
-  0%   { transform: translateX(var(--horse-x, 0px)) translateY(0);    }
-  50%  { transform: translateX(var(--horse-x, 0px)) translateY(-6px);  }
-  100% { transform: translateX(var(--horse-x, 0px)) translateY(0);    }
-}
-
-/* When the race is running, play the trot animation */
-.horse.running {
-  animation-play-state: running;
-}
-
-/* Highlight the winning horse */
-.horse.winner {
-  filter: drop-shadow(0 0 12px gold) drop-shadow(0 0 24px gold);
-  animation: none;
-}
-
-/* ── Status bar ────────────────────────────────────────── */
-#status-bar {
+/* Horse cards grid */
+.horse-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(.5rem, 1.5vw, 1rem);
   width: 100%;
-  text-align: center;
-  font-size: clamp(1rem, 3vw, 2rem);
-  font-weight: 600;
-  padding: clamp(0.4rem, 1.5vw, 1rem) 1rem;
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: 8px;
-  min-height: 3.2em;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  letter-spacing: 0.02em;
+}
+@media (min-width: 600px)  { .horse-cards { grid-template-columns: repeat(4, 1fr); } }
+
+.horse-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 10px;
+  padding: clamp(.6rem, 1.5vw, 1rem);
+  display: flex; align-items: center; gap: .6rem;
+  opacity: 0; animation: cardIn var(--transition-slow) ease forwards;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.horse-card:active { transform: scale(.97); }
+/* Staggered entrance */
+.horse-card:nth-child(1) { animation-delay: .05s; }
+.horse-card:nth-child(2) { animation-delay: .10s; }
+.horse-card:nth-child(3) { animation-delay: .15s; }
+.horse-card:nth-child(4) { animation-delay: .20s; }
+.horse-card:nth-child(5) { animation-delay: .25s; }
+.horse-card:nth-child(6) { animation-delay: .30s; }
+.horse-card:nth-child(7) { animation-delay: .35s; }
+.horse-card:nth-child(8) { animation-delay: .40s; }
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ── Control buttons ───────────────────────────────────── */
-#controls {
-  display: flex;
-  gap: clamp(0.5rem, 2vw, 1.5rem);
-  flex-wrap: wrap;
-  justify-content: center;
+.horse-card__number {
+  flex-shrink: 0;
+  width: var(--badge-size); height: var(--badge-size);
+  border-radius: 50%;
+  background: var(--card-color, #888);
+  color: #fff; font-weight: 800;
+  font-size: clamp(.7rem, 1.8vw, 1rem);
+  display: grid; place-items: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,.4);
 }
-
-.btn {
-  cursor: pointer;
-  border: none;
-  border-radius: 8px;
-  font-size: clamp(1rem, 2.5vw, 1.8rem);
+.horse-card__info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: .15rem; }
+.horse-card__name {
   font-weight: 700;
-  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(1.2rem, 4vw, 3rem);
-  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
-  letter-spacing: 0.03em;
+  font-size: clamp(.7rem, 1.6vw, .95rem);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.horse-card__swatch {
+  width: 28px; height: 6px; border-radius: 3px;
+}
+.horse-card__odds {
+  font-weight: 700; color: var(--gold);
+  font-size: clamp(.75rem, 1.6vw, 1rem);
+  white-space: nowrap;
 }
 
-.btn:active {
-  transform: scale(0.96);
-}
-
-.btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #f7971e, #ffd200);
+/* Start button */
+.btn--start {
+  position: relative;
+  background: linear-gradient(135deg, #f7971e 0%, #ffd200 100%);
   color: #1a1a2e;
-  box-shadow: 0 4px 16px rgba(255, 210, 0, 0.4);
+  font-size: clamp(1rem, 2.8vw, 1.5rem);
+  font-weight: 900; letter-spacing: .06em; text-transform: uppercase;
+  padding: clamp(.7rem, 2vw, 1rem) clamp(2rem, 6vw, 4rem);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(255,210,0,.35);
+  animation: pulseGlow 2s ease-in-out infinite;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.btn--start:active { transform: scale(.95); box-shadow: 0 2px 10px rgba(255,210,0,.25); }
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(255,210,0,.35); }
+  50%      { box-shadow: 0 4px 40px rgba(255,210,0,.6), 0 0 60px rgba(255,210,0,.2); }
 }
 
-.btn-primary:not(:disabled):hover {
-  box-shadow: 0 6px 24px rgba(255, 210, 0, 0.7);
-  transform: translateY(-2px);
+/* ══════════════════════════════════════════════════════════════════════════
+   RACE SCREEN
+   ══════════════════════════════════════════════════════════════════════ */
+#race-screen {
+  background: var(--bg-primary);
+  z-index: 5;
 }
 
-.btn-secondary {
-  background: linear-gradient(135deg, #4776e6, #8e54e9);
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(100, 100, 230, 0.4);
+/* ── Broadcast bar ─────────────────────────────────────────────────────── */
+.broadcast-bar {
+  flex-shrink: 0;
+  height: var(--bar-h);
+  background: linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.7) 100%);
+  border-bottom: 2px solid rgba(255,215,0,.25);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 clamp(.6rem, 2vw, 1.5rem);
+  font-size: clamp(.6rem, 1.5vw, .9rem);
+  letter-spacing: .06em;
+  z-index: 20;
+}
+.broadcast-bar__left, .broadcast-bar__right {
+  display: flex; align-items: center; gap: .5rem;
+}
+.broadcast-bar__live {
+  background: var(--accent); color: #fff;
+  font-weight: 800; font-size: .7em;
+  padding: .15em .5em; border-radius: 3px;
+  animation: liveBlink 1.5s ease-in-out infinite;
+}
+@keyframes liveBlink { 0%,100%{ opacity:1; } 50%{ opacity:.5; } }
+.broadcast-bar__race-name { font-weight: 700; text-transform: uppercase; }
+.broadcast-bar__timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800; color: var(--gold);
+  font-size: clamp(.8rem, 2vw, 1.3rem);
+}
+.broadcast-bar__leader-label { color: var(--text-muted); font-weight: 600; }
+.broadcast-bar__leader-name  { font-weight: 800; color: #fff; }
+
+/* ── Track ─────────────────────────────────────────────────────────────── */
+.track {
+  flex: 1; display: flex; flex-direction: column;
+  position: relative; overflow: hidden;
+  min-height: 0;
+}
+/* Crowd area */
+.track__crowd {
+  flex-shrink: 0;
+  height: clamp(20px, 4vw, 50px);
+  background:
+    repeating-linear-gradient(90deg,
+      rgba(255,255,255,.04) 0px, rgba(255,255,255,.04) 2px,
+      transparent 2px, transparent 6px),
+    linear-gradient(180deg, #0d0d1a 0%, #1a2030 100%);
+}
+/* Rails */
+.track__rail {
+  flex-shrink: 0; height: 6px;
+  background: linear-gradient(90deg,
+    var(--rail-color) 0%, #e8e8e8 40%, var(--rail-color) 100%);
+  box-shadow: 0 1px 4px rgba(0,0,0,.5);
+}
+.track__rail--top { border-bottom: 1px solid rgba(255,255,255,.15); }
+.track__rail--bottom { border-top: 1px solid rgba(255,255,255,.15); }
+
+/* Track surface */
+.track__surface {
+  flex: 1; position: relative;
+  background:
+    repeating-linear-gradient(90deg,
+      transparent 0px, transparent 60px,
+      rgba(0,0,0,.03) 60px, rgba(0,0,0,.03) 62px),
+    linear-gradient(180deg, var(--grass-dark) 0%, var(--grass-light) 50%, var(--grass-dark) 100%);
+  display: flex; flex-direction: column;
 }
 
-.btn-secondary:not(:disabled):hover {
-  box-shadow: 0 6px 24px rgba(100, 100, 230, 0.7);
-  transform: translateY(-2px);
+/* ── Lane ──────────────────────────────────────────────────────────────── */
+.lane {
+  flex: 1; position: relative;
+  display: flex; align-items: center;
+  min-height: var(--lane-h);
+  background:
+    linear-gradient(180deg,
+      var(--dirt) 0%, var(--dirt-light) 50%, var(--dirt) 100%);
+  border-bottom: 1px solid rgba(0,0,0,.25);
+  padding-left: clamp(.4rem, 1vw, .8rem);
+}
+.lane:nth-child(odd) {
+  background:
+    linear-gradient(180deg,
+      var(--dirt-dark) 0%, var(--dirt) 50%, var(--dirt-dark) 100%);
 }
 
-/* ── Responsive tweaks ─────────────────────────────────── */
+/* Lane number badge */
+.lane__badge {
+  position: relative; z-index: 5;
+  flex-shrink: 0;
+  width: var(--badge-size); height: var(--badge-size);
+  border-radius: 50%;
+  background: var(--lane-color, #888);
+  color: #fff; font-weight: 800;
+  font-size: clamp(.6rem, 1.4vw, .9rem);
+  display: grid; place-items: center;
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+}
 
-/* Small phones */
-@media (max-width: 480px) {
-  #finish-line {
-    right: 30px;
-    width: 8px;
+/* ── Horse element ─────────────────────────────────────────────────────── */
+.lane__horse {
+  position: absolute;
+  left: calc(var(--badge-size) + clamp(.4rem, 1vw, .8rem) + 4px);
+  transform: translateX(calc(var(--horse-x, 0) * 1%));
+  will-change: transform;
+  display: flex; flex-direction: column; align-items: center;
+  z-index: 6;
+}
+.horse__name-label {
+  font-size: clamp(.45rem, 1vw, .7rem);
+  font-weight: 700; color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,.8);
+  white-space: nowrap;
+  margin-bottom: 1px;
+  opacity: .9;
+}
+.horse__body {
+  width: var(--horse-w); height: var(--horse-h);
+  border-radius: 6px 12px 4px 4px;
+  background: var(--horse-color, #888);
+  box-shadow:
+    inset 0 -4px 0 rgba(0,0,0,.25),
+    inset 0 2px 0 rgba(255,255,255,.15),
+    0 3px 8px rgba(0,0,0,.4);
+  position: relative;
+}
+/* Jockey stripe on horse body */
+.horse__body::after {
+  content: '';
+  position: absolute;
+  top: 25%; left: 15%; right: 15%; height: 30%;
+  background: rgba(255,255,255,.2);
+  border-radius: 2px;
+}
+
+/* Galloping animation */
+.lane__horse.running .horse__body {
+  animation: gallop .3s steps(2) infinite;
+}
+@keyframes gallop {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-4px) scaleY(.95); }
+  100% { transform: translateY(0); }
+}
+/* Speed burst effect */
+.lane__horse.bursting .horse__body {
+  animation: gallop .22s steps(2) infinite;
+  box-shadow:
+    inset 0 -4px 0 rgba(0,0,0,.25),
+    inset 0 2px 0 rgba(255,255,255,.15),
+    0 3px 8px rgba(0,0,0,.4),
+    0 0 12px rgba(255,255,255,.3);
+}
+/* Winner glow */
+.lane__horse.winner .horse__body {
+  animation: winnerPulse 1s ease-in-out infinite;
+}
+@keyframes winnerPulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,.5), 0 0 30px rgba(255,215,0,.2); }
+  50%      { box-shadow: 0 0 20px rgba(255,215,0,.8), 0 0 50px rgba(255,215,0,.4); }
+}
+
+/* ── Finish line ───────────────────────────────────────────────────────── */
+.finish-line {
+  position: absolute;
+  top: 0; bottom: 0;
+  left: var(--finish-pos);
+  width: clamp(10px, 1.5vw, 20px);
+  background-image: repeating-conic-gradient(#000 0% 25%, #fff 25% 50%);
+  background-size: 10px 10px;
+  z-index: 4;
+  box-shadow: 0 0 12px rgba(255,255,255,.35);
+}
+
+/* ── Countdown overlay ─────────────────────────────────────────────────── */
+.countdown-overlay {
+  position: fixed; inset: 0;
+  display: grid; place-items: center;
+  background: rgba(0,0,0,.6);
+  z-index: 50;
+  transition: opacity var(--transition-fast);
+}
+.countdown-overlay--hidden { opacity: 0; pointer-events: none; }
+.countdown-overlay__text {
+  font-size: clamp(4rem, 15vw, 12rem);
+  font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 40px rgba(255,215,0,.5);
+  animation: countPop .4s ease-out;
+}
+@keyframes countPop {
+  0%   { transform: scale(1.6); opacity: 0; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Standings sidebar ─────────────────────────────────────────────────── */
+.standings {
+  position: absolute; right: 0; top: var(--bar-h);
+  width: clamp(130px, 18vw, 220px);
+  background: rgba(0,0,0,.7);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  border-left: 1px solid rgba(255,255,255,.08);
+  padding: clamp(.4rem, 1vw, .8rem);
+  z-index: 15;
+  transform: translateX(0);
+  transition: transform var(--transition-med) ease;
+}
+.standings__title {
+  font-size: clamp(.55rem, 1.2vw, .8rem);
+  font-weight: 800; color: var(--gold);
+  letter-spacing: .12em;
+  margin-bottom: .4rem;
+  text-align: center;
+}
+.standings__list { display: flex; flex-direction: column; gap: 2px; }
+.standings__item {
+  display: flex; align-items: center; gap: .35rem;
+  padding: clamp(.15rem, .4vw, .3rem) clamp(.25rem, .6vw, .4rem);
+  border-radius: 4px;
+  background: rgba(255,255,255,.04);
+  transition: transform var(--transition-fast), background var(--transition-fast);
+  font-size: clamp(.55rem, 1.2vw, .8rem);
+}
+.standings__item[data-standing="1"] { background: rgba(255,215,0,.12); }
+.standings__pos {
+  width: 1.4em; text-align: center;
+  font-weight: 800; color: var(--text-muted);
+}
+.standings__item[data-standing="1"] .standings__pos { color: var(--gold); }
+.standings__swatch {
+  width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0;
+}
+.standings__name {
+  flex: 1; font-weight: 600; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+
+/* ── Controls (mute/fullscreen) ────────────────────────────────────────── */
+.controls {
+  position: absolute; bottom: clamp(.5rem, 2vw, 1rem); left: clamp(.5rem, 2vw, 1rem);
+  display: flex; gap: .5rem; z-index: 20;
+}
+.btn--icon {
+  width: clamp(32px, 5vw, 44px); height: clamp(32px, 5vw, 44px);
+  border-radius: 8px;
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  font-size: clamp(.9rem, 2vw, 1.3rem);
+  display: grid; place-items: center;
+  border: 1px solid rgba(255,255,255,.1);
+  transition: background var(--transition-fast);
+}
+.btn--icon:active { background: rgba(255,255,255,.15); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESULTS OVERLAY
+   ══════════════════════════════════════════════════════════════════════ */
+.results-overlay {
+  z-index: 30;
+  align-items: center; justify-content: center;
+}
+.results-overlay__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.75);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+}
+.results-overlay__content {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column; align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+  max-width: 500px; width: 90%;
+}
+
+/* Winner banner */
+.results__winner-banner {
+  text-align: center;
+}
+.results__winner-label {
+  display: block;
+  font-size: clamp(.7rem, 2vw, 1rem);
+  font-weight: 800; letter-spacing: .2em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.results__winner-name {
+  font-size: clamp(1.6rem, 6vw, 3.5rem);
+  font-weight: 900; color: var(--gold);
+  text-shadow: 0 0 30px rgba(255,215,0,.4);
+  animation: winnerGlow 2s ease-in-out infinite;
+  line-height: 1.2;
+}
+@keyframes winnerGlow {
+  0%, 100% { text-shadow: 0 0 30px rgba(255,215,0,.4); }
+  50%      { text-shadow: 0 0 50px rgba(255,215,0,.7), 0 0 80px rgba(255,215,0,.3); }
+}
+.results__winner-time {
+  font-size: clamp(.7rem, 1.5vw, 1rem);
+  color: var(--text-muted); font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Finishing order */
+.results__order {
+  width: 100%;
+  display: flex; flex-direction: column; gap: 4px;
+}
+.results__order-item {
+  display: flex; align-items: center; gap: .5rem;
+  padding: clamp(.35rem, 1vw, .6rem) clamp(.5rem, 1.5vw, 1rem);
+  background: rgba(255,255,255,.05);
+  border-radius: 6px;
+  font-size: clamp(.7rem, 1.6vw, .95rem);
+  opacity: 0; animation: resultIn var(--transition-med) ease forwards;
+}
+.results__order-item:first-child { background: rgba(255,215,0,.12); }
+.results__order-pos {
+  width: 1.6em; font-weight: 800; color: var(--text-muted); text-align: center;
+}
+.results__order-item:first-child .results__order-pos { color: var(--gold); }
+.results__order-swatch {
+  width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0;
+}
+.results__order-name { flex: 1; font-weight: 600; }
+.results__order-time {
+  color: var(--text-muted); font-variant-numeric: tabular-nums;
+  font-size: .9em;
+}
+
+@keyframes resultIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+
+/* Mobile compact */
+@media (max-width: 767px) {
+  .standings {
+    position: fixed; bottom: 0; left: 0; right: 0; top: auto;
+    width: 100%; height: auto;
+    border-left: none; border-top: 1px solid rgba(255,255,255,.08);
+    transform: translateY(0);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: .2rem; padding: .3rem .5rem;
   }
+  .standings__title { display: none; }
+  .standings__list { flex-direction: row; flex-wrap: wrap; gap: .2rem; width: 100%; }
+  .standings__item { flex: 0 0 auto; font-size: clamp(.5rem, 2.5vw, .7rem); }
+  .standings__name { max-width: 60px; }
+  .controls { bottom: auto; top: calc(var(--bar-h) + .4rem); left: .4rem; }
+  .horse__name-label { display: none; }
 }
 
-/* Large / 4K screens – bump up base spacing a little more */
+/* Large / 4K */
 @media (min-width: 2560px) {
-  html {
-    font-size: 22px;
-  }
+  html { font-size: 22px; }
 }
