@@ -1,59 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Horse Race 🏇</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0e1a">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Golden Cup Classic — Premium Horse Racing Game">
+  <title>Golden Cup Classic — Horse Racing</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header>
-    <h1>🏇 Horse Race</h1>
-  </header>
 
-  <main>
-    <!-- Race track containing all lanes and the finish line -->
-    <div id="track-container" aria-label="Race track">
-      <!-- The finish line is positioned at the right end of the track -->
-      <div id="finish-line" aria-hidden="true"></div>
+  <!-- ==================== PRE-RACE SCREEN ==================== -->
+  <section id="pre-race" class="screen" aria-label="Pre-race information">
+    <div class="pre-race__inner">
+      <header class="pre-race__header">
+        <div class="pre-race__badge">RACE&nbsp;DAY</div>
+        <h1 class="pre-race__title">Golden Cup Classic</h1>
+        <p class="pre-race__subtitle">8 Furlongs &middot; Grade&nbsp;I Stakes</p>
+      </header>
 
-      <!-- Six horse lanes, one per horse -->
-      <div class="lane" id="lane-1">
-        <span class="lane-number">1</span>
-        <div class="horse" id="horse-1" role="img" aria-label="Horse 1">🐴</div>
+      <div class="horse-cards" aria-label="Race card — 8 runners">
+        <article class="horse-card" data-horse-id="1">
+          <span class="horse-card__number" style="--card-color:#e63946">1</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Thunder Strike</span>
+            <span class="horse-card__swatch" style="background:#e63946" aria-label="Jockey silks: red"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>3/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="2">
+          <span class="horse-card__number" style="--card-color:#1d3557">2</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Midnight Storm</span>
+            <span class="horse-card__swatch" style="background:#1d3557" aria-label="Jockey silks: navy"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>5/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="3">
+          <span class="horse-card__number" style="--card-color:#f4a236">3</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Golden Arrow</span>
+            <span class="horse-card__swatch" style="background:#f4a236" aria-label="Jockey silks: gold"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>4/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="4">
+          <span class="horse-card__number" style="--card-color:#d62828">4</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Crimson Flash</span>
+            <span class="horse-card__swatch" style="background:#d62828" aria-label="Jockey silks: crimson"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>6/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="5">
+          <span class="horse-card__number" style="--card-color:#a8dadc">5</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Silver Bullet</span>
+            <span class="horse-card__swatch" style="background:#a8dadc" aria-label="Jockey silks: silver"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>7/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="6">
+          <span class="horse-card__number" style="--card-color:#e9c46a">6</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Desert Wind</span>
+            <span class="horse-card__swatch" style="background:#e9c46a" aria-label="Jockey silks: sand"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>8/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="7">
+          <span class="horse-card__number" style="--card-color:#457b9d">7</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Iron Will</span>
+            <span class="horse-card__swatch" style="background:#457b9d" aria-label="Jockey silks: steel blue"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>10/1</span>
+        </article>
+        <article class="horse-card" data-horse-id="8">
+          <span class="horse-card__number" style="--card-color:#6a0572">8</span>
+          <div class="horse-card__info">
+            <span class="horse-card__name">Lucky Star</span>
+            <span class="horse-card__swatch" style="background:#6a0572" aria-label="Jockey silks: purple"></span>
+          </div>
+          <span class="horse-card__odds" data-odds>12/1</span>
+        </article>
       </div>
-      <div class="lane" id="lane-2">
-        <span class="lane-number">2</span>
-        <div class="horse" id="horse-2" role="img" aria-label="Horse 2">🐴</div>
+
+      <button id="start-btn" class="btn btn--start" aria-label="Start race">
+        <span class="btn__text">START RACE</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ==================== RACE SCREEN ==================== -->
+  <section id="race-screen" class="screen screen--hidden" aria-label="Live race">
+
+    <!-- Broadcast top bar -->
+    <header class="broadcast-bar" aria-label="Race broadcast bar">
+      <div class="broadcast-bar__left">
+        <span class="broadcast-bar__live">LIVE</span>
+        <span class="broadcast-bar__race-name">GOLDEN CUP CLASSIC</span>
       </div>
-      <div class="lane" id="lane-3">
-        <span class="lane-number">3</span>
-        <div class="horse" id="horse-3" role="img" aria-label="Horse 3">🐴</div>
+      <div class="broadcast-bar__center">
+        <span class="broadcast-bar__timer" id="race-timer">00:00.00</span>
       </div>
-      <div class="lane" id="lane-4">
-        <span class="lane-number">4</span>
-        <div class="horse" id="horse-4" role="img" aria-label="Horse 4">🐴</div>
+      <div class="broadcast-bar__right">
+        <span class="broadcast-bar__leader-label">LEADER</span>
+        <span class="broadcast-bar__leader-name" id="race-leader">&mdash;</span>
       </div>
-      <div class="lane" id="lane-5">
-        <span class="lane-number">5</span>
-        <div class="horse" id="horse-5" role="img" aria-label="Horse 5">🐴</div>
+    </header>
+
+    <!-- Track area -->
+    <div class="track" aria-label="Race track">
+      <div class="track__crowd"></div>
+      <div class="track__rail track__rail--top"></div>
+
+      <div class="track__surface">
+        <div class="lane" data-lane="1">
+          <span class="lane__badge" style="--lane-color:#e63946">1</span>
+          <div class="lane__horse" data-horse-el="1" style="--horse-color:#e63946;--horse-x:0">
+            <span class="horse__name-label">Thunder Strike</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="2">
+          <span class="lane__badge" style="--lane-color:#1d3557">2</span>
+          <div class="lane__horse" data-horse-el="2" style="--horse-color:#1d3557;--horse-x:0">
+            <span class="horse__name-label">Midnight Storm</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="3">
+          <span class="lane__badge" style="--lane-color:#f4a236">3</span>
+          <div class="lane__horse" data-horse-el="3" style="--horse-color:#f4a236;--horse-x:0">
+            <span class="horse__name-label">Golden Arrow</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="4">
+          <span class="lane__badge" style="--lane-color:#d62828">4</span>
+          <div class="lane__horse" data-horse-el="4" style="--horse-color:#d62828;--horse-x:0">
+            <span class="horse__name-label">Crimson Flash</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="5">
+          <span class="lane__badge" style="--lane-color:#a8dadc">5</span>
+          <div class="lane__horse" data-horse-el="5" style="--horse-color:#a8dadc;--horse-x:0">
+            <span class="horse__name-label">Silver Bullet</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="6">
+          <span class="lane__badge" style="--lane-color:#e9c46a">6</span>
+          <div class="lane__horse" data-horse-el="6" style="--horse-color:#e9c46a;--horse-x:0">
+            <span class="horse__name-label">Desert Wind</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="7">
+          <span class="lane__badge" style="--lane-color:#457b9d">7</span>
+          <div class="lane__horse" data-horse-el="7" style="--horse-color:#457b9d;--horse-x:0">
+            <span class="horse__name-label">Iron Will</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+        <div class="lane" data-lane="8">
+          <span class="lane__badge" style="--lane-color:#6a0572">8</span>
+          <div class="lane__horse" data-horse-el="8" style="--horse-color:#6a0572;--horse-x:0">
+            <span class="horse__name-label">Lucky Star</span>
+            <div class="horse__body"></div>
+          </div>
+        </div>
+
+        <div class="finish-line" aria-label="Finish line"></div>
       </div>
-      <div class="lane" id="lane-6">
-        <span class="lane-number">6</span>
-        <div class="horse" id="horse-6" role="img" aria-label="Horse 6">🐴</div>
-      </div>
+
+      <div class="track__rail track__rail--bottom"></div>
     </div>
 
-    <!-- Race status / winner announcement -->
-    <div id="status-bar" aria-live="polite">Press "Start Race" to begin!</div>
+    <!-- Countdown overlay -->
+    <div id="countdown-overlay" class="countdown-overlay countdown-overlay--hidden" aria-live="polite">
+      <span id="countdown-text" class="countdown-overlay__text"></span>
+    </div>
+
+    <!-- Live standings sidebar -->
+    <aside class="standings" id="standings" aria-label="Live standings">
+      <h2 class="standings__title">LIVE ORDER</h2>
+      <ol class="standings__list" id="standings-list">
+        <li class="standings__item" data-standing="1"><span class="standings__pos">1</span><span class="standings__swatch" style="background:#e63946"></span><span class="standings__name">Thunder Strike</span></li>
+        <li class="standings__item" data-standing="2"><span class="standings__pos">2</span><span class="standings__swatch" style="background:#1d3557"></span><span class="standings__name">Midnight Storm</span></li>
+        <li class="standings__item" data-standing="3"><span class="standings__pos">3</span><span class="standings__swatch" style="background:#f4a236"></span><span class="standings__name">Golden Arrow</span></li>
+        <li class="standings__item" data-standing="4"><span class="standings__pos">4</span><span class="standings__swatch" style="background:#d62828"></span><span class="standings__name">Crimson Flash</span></li>
+        <li class="standings__item" data-standing="5"><span class="standings__pos">5</span><span class="standings__swatch" style="background:#a8dadc"></span><span class="standings__name">Silver Bullet</span></li>
+        <li class="standings__item" data-standing="6"><span class="standings__pos">6</span><span class="standings__swatch" style="background:#e9c46a"></span><span class="standings__name">Desert Wind</span></li>
+        <li class="standings__item" data-standing="7"><span class="standings__pos">7</span><span class="standings__swatch" style="background:#457b9d"></span><span class="standings__name">Iron Will</span></li>
+        <li class="standings__item" data-standing="8"><span class="standings__pos">8</span><span class="standings__swatch" style="background:#6a0572"></span><span class="standings__name">Lucky Star</span></li>
+      </ol>
+    </aside>
 
     <!-- Control buttons -->
-    <div id="controls">
-      <button id="btn-start" class="btn btn-primary">🚦 Start Race</button>
-      <button id="btn-again" class="btn btn-secondary" disabled>🔄 Race Again</button>
+    <div class="controls" aria-label="Race controls">
+      <button id="mute-btn" class="btn btn--icon" aria-label="Toggle sound">&#x1F50A;</button>
+      <button id="fullscreen-btn" class="btn btn--icon" aria-label="Toggle fullscreen">&#x26F6;</button>
     </div>
-  </main>
+  </section>
 
-  <script src="game.js"></script>
+  <!-- ==================== RESULTS OVERLAY ==================== -->
+  <section id="results-overlay" class="screen screen--hidden results-overlay" aria-label="Race results">
+    <div class="results-overlay__backdrop"></div>
+    <div class="results-overlay__content">
+      <div class="results__winner-banner">
+        <span class="results__winner-label">WINNER</span>
+        <h2 class="results__winner-name" id="winner-name">&mdash;</h2>
+        <span class="results__winner-time" id="winner-time"></span>
+      </div>
+      <ol class="results__order" id="results-order" aria-label="Finishing order"></ol>
+      <button id="race-again-btn" class="btn btn--start" aria-label="Race again">
+        <span class="btn__text">RACE AGAIN</span>
+      </button>
+    </div>
+  </section>
+
+  <script src="game.js" defer></script>
 </body>
 </html>
