@@ -371,7 +371,7 @@ ol, ul { list-style: none; }
   z-index: 50;
   transition: opacity var(--transition-fast);
 }
-.countdown-overlay--hidden { opacity: 0; pointer-events: none; }
+.countdown-overlay--hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 .countdown-overlay__text {
   font-size: clamp(4rem, 15vw, 12rem);
   font-weight: 900; color: var(--gold);

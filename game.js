@@ -247,20 +247,35 @@ const SoundManager = {
 // =====================================================================
 
 function calculateOdds() {
-  // Strength score from stats
+  // Strength score from stats — weight key factors heavily
   const scores = HORSE_DATA.map((h) => {
-    return h.baseSpeed * 3 + h.stamina * 2 + h.acceleration * 20 +
-           h.burstChance * 40 + h.burstPower + h.consistency * 1.5 + h.recovery;
+    return h.baseSpeed * 10 + h.stamina * 6 + h.acceleration * 50 +
+           h.burstChance * 80 + h.burstPower * 2 + h.consistency * 4 + h.recovery * 2;
   });
   const maxScore = Math.max(...scores);
+  const minScore = Math.min(...scores);
+  const range = maxScore - minScore || 1;
 
-  HORSE_DATA.forEach((h, i) => {
-    const ratio = maxScore / scores[i];
-    // Convert to fractional odds-like display
-    const raw = Math.round(ratio * 3);
-    h.odds = Math.max(2, raw);
-    h.oddsDisplay = h.odds + "/1";
-    h.strengthScore = scores[i];
+  // Common fractional odds for horse racing
+  const oddsTable = [
+    "2/1", "5/2", "3/1", "7/2", "4/1", "9/2", "5/1",
+    "6/1", "7/1", "8/1", "10/1", "12/1", "14/1", "16/1",
+  ];
+
+  // Rank horses by score descending, assign odds accordingly
+  const indexed = scores.map((s, i) => ({ score: s, idx: i }));
+  indexed.sort((a, b) => b.score - a.score);
+
+  indexed.forEach((entry, rank) => {
+    const h = HORSE_DATA[entry.idx];
+    // Map rank to odds table position, spreading across the table
+    const oddsIdx = Math.min(
+      oddsTable.length - 1,
+      Math.round((rank / (HORSE_DATA.length - 1)) * (oddsTable.length - 1))
+    );
+    h.oddsDisplay = oddsTable[oddsIdx];
+    h.odds = parseInt(oddsTable[oddsIdx]);
+    h.strengthScore = entry.score;
   });
 
   // Update DOM odds
