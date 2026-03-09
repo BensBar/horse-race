@@ -267,6 +267,7 @@ ol, ul { list-style: none; }
       var(--dirt) 0%, var(--dirt-light) 50%, var(--dirt) 100%);
   border-bottom: 1px solid rgba(0,0,0,.25);
   padding-left: clamp(.4rem, 1vw, .8rem);
+  container-type: inline-size;
 }
 .lane:nth-child(odd) {
   background:
@@ -292,7 +293,7 @@ ol, ul { list-style: none; }
 .lane__horse {
   position: absolute;
   left: calc(var(--badge-size) + clamp(.4rem, 1vw, .8rem) + 4px);
-  transform: translateX(calc(var(--horse-x, 0) * 1%));
+  transform: translateX(calc(var(--horse-x, 0) * 1cqw));
   will-change: transform;
   display: flex; flex-direction: column; align-items: center;
   z-index: 6;
@@ -307,40 +308,61 @@ ol, ul { list-style: none; }
 }
 .horse__body {
   width: var(--horse-w); height: var(--horse-h);
-  border-radius: 6px 12px 4px 4px;
-  background: var(--horse-color, #888);
+  border-radius: 30% 50% 18% 25%;
+  background:
+    linear-gradient(160deg, rgba(255,255,255,.15) 0%, transparent 50%, rgba(0,0,0,.1) 100%),
+    var(--horse-color, #888);
   box-shadow:
-    inset 0 -4px 0 rgba(0,0,0,.25),
-    inset 0 2px 0 rgba(255,255,255,.15),
-    0 3px 8px rgba(0,0,0,.4);
+    inset 0 -3px 0 rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.2),
+    0 3px 8px rgba(0,0,0,.5);
   position: relative;
+  overflow: visible;
 }
-/* Jockey stripe on horse body */
+/* Horse head and neck */
+.horse__body::before {
+  content: '';
+  position: absolute;
+  right: -22%;
+  top: -40%;
+  width: 38%;
+  height: 72%;
+  background:
+    linear-gradient(140deg, rgba(255,255,255,.12) 0%, transparent 60%),
+    var(--horse-color, #888);
+  border-radius: 35% 60% 45% 20%;
+  transform: rotate(-12deg);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.15),
+    1px -1px 3px rgba(0,0,0,.3);
+}
+/* Jockey silks accent on body */
 .horse__body::after {
   content: '';
   position: absolute;
-  top: 25%; left: 15%; right: 15%; height: 30%;
-  background: rgba(255,255,255,.2);
-  border-radius: 2px;
+  top: 15%; left: 25%; width: 35%; height: 45%;
+  background: rgba(255,255,255,.22);
+  border-radius: 50%;
 }
 
 /* Galloping animation */
 .lane__horse.running .horse__body {
-  animation: gallop .3s steps(2) infinite;
+  animation: gallop .35s ease-in-out infinite;
 }
 @keyframes gallop {
-  0%   { transform: translateY(0); }
-  50%  { transform: translateY(-4px) scaleY(.95); }
-  100% { transform: translateY(0); }
+  0%   { transform: translateY(0) rotate(0deg); }
+  30%  { transform: translateY(-4px) rotate(-1.5deg) scaleY(.96); }
+  60%  { transform: translateY(-2px) rotate(1deg); }
+  100% { transform: translateY(0) rotate(0deg); }
 }
 /* Speed burst effect */
 .lane__horse.bursting .horse__body {
-  animation: gallop .22s steps(2) infinite;
+  animation: gallop .24s ease-in-out infinite;
   box-shadow:
-    inset 0 -4px 0 rgba(0,0,0,.25),
-    inset 0 2px 0 rgba(255,255,255,.15),
-    0 3px 8px rgba(0,0,0,.4),
-    0 0 12px rgba(255,255,255,.3);
+    inset 0 -3px 0 rgba(0,0,0,.3),
+    inset 0 2px 0 rgba(255,255,255,.2),
+    0 3px 8px rgba(0,0,0,.5),
+    0 0 14px rgba(255,255,255,.35);
 }
 /* Winner glow */
 .lane__horse.winner .horse__body {
