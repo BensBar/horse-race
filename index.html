@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Horse Race 🏇</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>🏇 Horse Race</h1>
+  </header>
+
+  <main>
+    <!-- Race track containing all lanes and the finish line -->
+    <div id="track-container" aria-label="Race track">
+      <!-- The finish line is positioned at the right end of the track -->
+      <div id="finish-line" aria-hidden="true"></div>
+
+      <!-- Six horse lanes, one per horse -->
+      <div class="lane" id="lane-1">
+        <span class="lane-number">1</span>
+        <div class="horse" id="horse-1" role="img" aria-label="Horse 1">🐴</div>
+      </div>
+      <div class="lane" id="lane-2">
+        <span class="lane-number">2</span>
+        <div class="horse" id="horse-2" role="img" aria-label="Horse 2">🐴</div>
+      </div>
+      <div class="lane" id="lane-3">
+        <span class="lane-number">3</span>
+        <div class="horse" id="horse-3" role="img" aria-label="Horse 3">🐴</div>
+      </div>
+      <div class="lane" id="lane-4">
+        <span class="lane-number">4</span>
+        <div class="horse" id="horse-4" role="img" aria-label="Horse 4">🐴</div>
+      </div>
+      <div class="lane" id="lane-5">
+        <span class="lane-number">5</span>
+        <div class="horse" id="horse-5" role="img" aria-label="Horse 5">🐴</div>
+      </div>
+      <div class="lane" id="lane-6">
+        <span class="lane-number">6</span>
+        <div class="horse" id="horse-6" role="img" aria-label="Horse 6">🐴</div>
+      </div>
+    </div>
+
+    <!-- Race status / winner announcement -->
+    <div id="status-bar" aria-live="polite">Press "Start Race" to begin!</div>
+
+    <!-- Control buttons -->
+    <div id="controls">
+      <button id="btn-start" class="btn btn-primary">🚦 Start Race</button>
+      <button id="btn-again" class="btn btn-secondary" disabled>🔄 Race Again</button>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
