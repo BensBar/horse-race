@@ -23,6 +23,10 @@ const RACE_CONFIG = {
   updateInterval: 16,         // ~60fps target
   randomRaceProbability: 0.20,  // chance of no pre-selected winner
   visualScaleFactor: 0.85,      // maps position % to CSS visual range
+  maxDeltaMs: 50,             // cap delta to ~3 dropped frames to prevent physics instability
+  burstMinFrames: 30,         // minimum frames a speed burst lasts
+  burstRangeFrames: 30,       // additional random frames added to burst duration
+  winnerNudgeGap: 8,          // position gap (%) that triggers catch-up boost for pre-selected winner
 };
 
 // Pre-computed: speed scale factor so horses finish in ~35s
@@ -274,7 +278,7 @@ function calculateOdds() {
       Math.round((rank / (HORSE_DATA.length - 1)) * (oddsTable.length - 1))
     );
     h.oddsDisplay = oddsTable[oddsIdx];
-    h.odds = parseInt(oddsTable[oddsIdx]);
+    h.odds = parseInt(oddsTable[oddsIdx]); // display-only numerator; not used in arithmetic
     h.strengthScore = entry.score;
   });
 
@@ -411,9 +415,10 @@ function startCountdown() {
       return;
     }
     dom.countdownText.textContent = steps[i];
-    // Re-trigger animation
+    // Reset and re-trigger the CSS pop animation by toggling the animation property.
+    // Reading offsetWidth forces a synchronous reflow so the browser registers the
+    // "none" state before re-applying the animation, ensuring it plays from the start.
     dom.countdownText.style.animation = "none";
-    // Force reflow
     void dom.countdownText.offsetWidth;
     dom.countdownText.style.animation = "";
 
@@ -457,8 +462,7 @@ function startRace() {
 function raceLoop(timestamp) {
   if (gameState !== State.RACING && gameState !== State.FINISHING) return;
 
-  // Cap at 50ms (~3 dropped frames at 60fps) to prevent physics instability
-  const deltaMs = Math.min(timestamp - lastFrameTime, 50);
+  const deltaMs = Math.min(timestamp - lastFrameTime, RACE_CONFIG.maxDeltaMs);
   lastFrameTime = timestamp;
   elapsedTime = timestamp - raceStartTime;
 
@@ -560,7 +564,7 @@ function updateHorsePhysics(horse, deltaFactor, raceProgress) {
     }
   } else if (Math.random() < horse.burstChance * deltaFactor) {
     horse.burstActive = true;
-    horse.burstFramesLeft = 30 + Math.random() * 30;
+    horse.burstFramesLeft = RACE_CONFIG.burstMinFrames + Math.random() * RACE_CONFIG.burstRangeFrames;
     if (horse.el) horse.el.classList.add("bursting");
   }
 
@@ -578,7 +582,7 @@ function updateHorsePhysics(horse, deltaFactor, raceProgress) {
     if (progressRatio > 0.5 && progressRatio < 0.8) {
       const leaderPos = Math.max(...horses.map((h) => h.position));
       const gap = leaderPos - horse.position;
-      if (gap > 8) {
+      if (gap > RACE_CONFIG.winnerNudgeGap) {
         speed *= 1.04;
       }
     }
