@@ -1,0 +1,243 @@
+/* =========================================================
+   Horse Race – styles.css
+   Responsive layout targeting iPhone Safari through 4K TVs.
+   ========================================================= */
+
+/* ── Reset & base ──────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px; /* base; scaled up with clamp() below */
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: clamp(0.75rem, 3vw, 3rem);
+  gap: clamp(1rem, 3vw, 2rem);
+}
+
+/* ── Header ────────────────────────────────────────────── */
+header {
+  width: 100%;
+  max-width: 1400px;
+  text-align: center;
+}
+
+h1 {
+  font-size: clamp(1.8rem, 5vw, 4rem);
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 20px rgba(255, 200, 0, 0.6);
+}
+
+/* ── Main content wrapper ──────────────────────────────── */
+main {
+  width: 100%;
+  max-width: 1400px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+/* ── Track container ───────────────────────────────────── */
+#track-container {
+  position: relative;
+  width: 100%;
+  background: linear-gradient(135deg, #2d5a1b 0%, #3a7a25 50%, #2d5a1b 100%);
+  border: 4px solid #8b6914;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              inset 0 0 40px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Finish line ───────────────────────────────────────── */
+/*
+   The finish line is an absolutely positioned element
+   pinned to the right side of the track.
+   A repeating checkerboard pattern is achieved with a CSS
+   background gradient.
+*/
+#finish-line {
+  position: absolute;
+  top: 0;
+  right: clamp(40px, 6%, 90px);
+  width: clamp(8px, 1.2vw, 18px);
+  height: 100%;
+  background-image: repeating-conic-gradient(
+    #000 0% 25%,
+    #fff 25% 50%
+  );
+  background-size: 12px 12px;
+  z-index: 10;
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.6);
+}
+
+/* ── Individual lane ───────────────────────────────────── */
+.lane {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: clamp(50px, 8vw, 110px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0 0.5rem;
+}
+
+.lane:last-child {
+  border-bottom: none;
+}
+
+/* Alternate lane shading for readability */
+.lane:nth-child(odd) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* ── Lane number badge ─────────────────────────────────── */
+.lane-number {
+  flex-shrink: 0;
+  width: clamp(24px, 3vw, 48px);
+  height: clamp(24px, 3vw, 48px);
+  line-height: clamp(24px, 3vw, 48px);
+  text-align: center;
+  font-weight: bold;
+  font-size: clamp(0.75rem, 2vw, 1.5rem);
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 50%;
+  color: #ffd700;
+  margin-right: 0.5rem;
+  z-index: 5;
+  position: relative;
+}
+
+/* ── Horse emoji ───────────────────────────────────────── */
+/*
+   Each horse is absolutely positioned inside its lane and
+   translated along the X axis by game.js.
+   The left offset accounts for the lane-number badge width
+   so the horse starts just after the badge.
+*/
+.horse {
+  position: absolute;
+  left: 0;
+  /* translateX is set dynamically by game.js */
+  font-size: clamp(1.8rem, 5vw, 5rem);
+  line-height: 1;
+  /* Subtle trotting bob via CSS animation */
+  animation: trot 0.35s steps(2) infinite paused;
+  transform-origin: center bottom;
+  z-index: 5;
+  user-select: none;
+  will-change: transform;
+  transition: filter 0.3s;
+}
+
+/* Trot bob animation (running once race starts via JS class) */
+@keyframes trot {
+  0%   { transform: translateX(var(--horse-x, 0px)) translateY(0);    }
+  50%  { transform: translateX(var(--horse-x, 0px)) translateY(-6px);  }
+  100% { transform: translateX(var(--horse-x, 0px)) translateY(0);    }
+}
+
+/* When the race is running, play the trot animation */
+.horse.running {
+  animation-play-state: running;
+}
+
+/* Highlight the winning horse */
+.horse.winner {
+  filter: drop-shadow(0 0 12px gold) drop-shadow(0 0 24px gold);
+  animation: none;
+}
+
+/* ── Status bar ────────────────────────────────────────── */
+#status-bar {
+  width: 100%;
+  text-align: center;
+  font-size: clamp(1rem, 3vw, 2rem);
+  font-weight: 600;
+  padding: clamp(0.4rem, 1.5vw, 1rem) 1rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 8px;
+  min-height: 3.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 0.02em;
+}
+
+/* ── Control buttons ───────────────────────────────────── */
+#controls {
+  display: flex;
+  gap: clamp(0.5rem, 2vw, 1.5rem);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.btn {
+  cursor: pointer;
+  border: none;
+  border-radius: 8px;
+  font-size: clamp(1rem, 2.5vw, 1.8rem);
+  font-weight: 700;
+  padding: clamp(0.5rem, 1.5vw, 1rem) clamp(1.2rem, 4vw, 3rem);
+  transition: transform 0.1s, box-shadow 0.1s, opacity 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #f7971e, #ffd200);
+  color: #1a1a2e;
+  box-shadow: 0 4px 16px rgba(255, 210, 0, 0.4);
+}
+
+.btn-primary:not(:disabled):hover {
+  box-shadow: 0 6px 24px rgba(255, 210, 0, 0.7);
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #4776e6, #8e54e9);
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(100, 100, 230, 0.4);
+}
+
+.btn-secondary:not(:disabled):hover {
+  box-shadow: 0 6px 24px rgba(100, 100, 230, 0.7);
+  transform: translateY(-2px);
+}
+
+/* ── Responsive tweaks ─────────────────────────────────── */
+
+/* Small phones */
+@media (max-width: 480px) {
+  #finish-line {
+    right: 30px;
+    width: 8px;
+  }
+}
+
+/* Large / 4K screens – bump up base spacing a little more */
+@media (min-width: 2560px) {
+  html {
+    font-size: 22px;
+  }
+}
