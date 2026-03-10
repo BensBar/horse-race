@@ -262,6 +262,7 @@ ol, ul { list-style: none; }
   flex: 1; position: relative;
   display: flex; align-items: center;
   min-height: var(--lane-h);
+  container-type: inline-size;
   background:
     linear-gradient(180deg,
       var(--dirt) 0%, var(--dirt-light) 50%, var(--dirt) 100%);
@@ -292,7 +293,7 @@ ol, ul { list-style: none; }
 .lane__horse {
   position: absolute;
   left: calc(var(--badge-size) + clamp(.4rem, 1vw, .8rem) + 4px);
-  transform: translateX(calc(var(--horse-x, 0) * 1%));
+  transform: translateX(calc(var(--horse-x, 0) * 1cqw));
   will-change: transform;
   display: flex; flex-direction: column; align-items: center;
   z-index: 6;

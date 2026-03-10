@@ -22,7 +22,7 @@ const RACE_CONFIG = {
   numHorses: 8,
   updateInterval: 16,         // ~60fps target
   randomRaceProbability: 0.20,  // chance of no pre-selected winner
-  visualScaleFactor: 0.85,      // maps position % to CSS visual range
+  visualScaleFactor: 0.87,      // maps position % to CSS visual range (cqw units)
   maxDeltaMs: 50,             // cap delta to ~3 dropped frames to prevent physics instability
   burstMinFrames: 30,         // minimum frames a speed burst lasts
   burstRangeFrames: 30,       // additional random frames added to burst duration
