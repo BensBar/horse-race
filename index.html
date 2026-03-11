@@ -112,74 +112,288 @@
       </div>
     </header>
 
-    <!-- Track area -->
-    <div class="track" aria-label="Race track">
-      <div class="track__crowd"></div>
-      <div class="track__rail track__rail--top"></div>
+    <!-- Race stage: outer frame that visually grounds the track -->
+    <div class="race-stage">
 
-      <div class="track__surface">
-        <div class="lane" data-lane="1">
-          <span class="lane__badge" style="--lane-color:#e63946">1</span>
-          <div class="lane__horse" data-horse-el="1" style="--horse-color:#e63946;--horse-x:0">
-            <span class="horse__name-label">Thunder Strike</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="2">
-          <span class="lane__badge" style="--lane-color:#1d3557">2</span>
-          <div class="lane__horse" data-horse-el="2" style="--horse-color:#1d3557;--horse-x:0">
-            <span class="horse__name-label">Midnight Storm</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="3">
-          <span class="lane__badge" style="--lane-color:#f4a236">3</span>
-          <div class="lane__horse" data-horse-el="3" style="--horse-color:#f4a236;--horse-x:0">
-            <span class="horse__name-label">Golden Arrow</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="4">
-          <span class="lane__badge" style="--lane-color:#d62828">4</span>
-          <div class="lane__horse" data-horse-el="4" style="--horse-color:#d62828;--horse-x:0">
-            <span class="horse__name-label">Crimson Flash</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="5">
-          <span class="lane__badge" style="--lane-color:#a8dadc">5</span>
-          <div class="lane__horse" data-horse-el="5" style="--horse-color:#a8dadc;--horse-x:0">
-            <span class="horse__name-label">Silver Bullet</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="6">
-          <span class="lane__badge" style="--lane-color:#e9c46a">6</span>
-          <div class="lane__horse" data-horse-el="6" style="--horse-color:#e9c46a;--horse-x:0">
-            <span class="horse__name-label">Desert Wind</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="7">
-          <span class="lane__badge" style="--lane-color:#457b9d">7</span>
-          <div class="lane__horse" data-horse-el="7" style="--horse-color:#457b9d;--horse-x:0">
-            <span class="horse__name-label">Iron Will</span>
-            <div class="horse__body"></div>
-          </div>
-        </div>
-        <div class="lane" data-lane="8">
-          <span class="lane__badge" style="--lane-color:#6a0572">8</span>
-          <div class="lane__horse" data-horse-el="8" style="--horse-color:#6a0572;--horse-x:0">
-            <span class="horse__name-label">Lucky Star</span>
-            <div class="horse__body"></div>
-          </div>
+      <!-- Track area -->
+      <div class="track" aria-label="Race track">
+
+        <!-- Stadium grandstand / crowd backdrop -->
+        <div class="track__grandstand">
+          <div class="track__grandstand-lights"></div>
         </div>
 
-        <div class="finish-line" aria-label="Finish line"></div>
-      </div>
+        <!-- Top outer rail -->
+        <div class="track__rail track__rail--top"></div>
 
-      <div class="track__rail track__rail--bottom"></div>
-    </div>
+        <!-- Racing surface: all 8 dirt lanes live here -->
+        <div class="track__surface">
+
+          <!--
+            Horse SVG silhouette — the SVG paths are identical across all 8 lanes.
+            Color is driven by CSS `color: var(--horse-color)` on .lane__horse,
+            which is inherited by fill="currentColor" inside the SVG.
+          -->
+
+          <div class="lane" data-lane="1">
+            <span class="lane__badge" style="--lane-color:#e63946">1</span>
+            <div class="lane__horse" data-horse-el="1" style="--horse-color:#e63946;--horse-x:0">
+              <span class="horse__name-label">Thunder Strike</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="2">
+            <span class="lane__badge" style="--lane-color:#1d3557">2</span>
+            <div class="lane__horse" data-horse-el="2" style="--horse-color:#1d3557;--horse-x:0">
+              <span class="horse__name-label">Midnight Storm</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="3">
+            <span class="lane__badge" style="--lane-color:#f4a236">3</span>
+            <div class="lane__horse" data-horse-el="3" style="--horse-color:#f4a236;--horse-x:0">
+              <span class="horse__name-label">Golden Arrow</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="4">
+            <span class="lane__badge" style="--lane-color:#d62828">4</span>
+            <div class="lane__horse" data-horse-el="4" style="--horse-color:#d62828;--horse-x:0">
+              <span class="horse__name-label">Crimson Flash</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="5">
+            <span class="lane__badge" style="--lane-color:#a8dadc">5</span>
+            <div class="lane__horse" data-horse-el="5" style="--horse-color:#a8dadc;--horse-x:0">
+              <span class="horse__name-label">Silver Bullet</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="6">
+            <span class="lane__badge" style="--lane-color:#e9c46a">6</span>
+            <div class="lane__horse" data-horse-el="6" style="--horse-color:#e9c46a;--horse-x:0">
+              <span class="horse__name-label">Desert Wind</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="7">
+            <span class="lane__badge" style="--lane-color:#457b9d">7</span>
+            <div class="lane__horse" data-horse-el="7" style="--horse-color:#457b9d;--horse-x:0">
+              <span class="horse__name-label">Iron Will</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="lane" data-lane="8">
+            <span class="lane__badge" style="--lane-color:#6a0572">8</span>
+            <div class="lane__horse" data-horse-el="8" style="--horse-color:#6a0572;--horse-x:0">
+              <span class="horse__name-label">Lucky Star</span>
+              <div class="horse__body">
+                <svg class="horse__svg" viewBox="0 0 88 56" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M15,28 C10,22 8,13 12,7 C13.5,4 16,5.5 15.5,9 C15,14 14,22 15,28Z"/>
+                  <rect class="horse__leg horse__leg--bf" x="19" y="36" width="5" height="18" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--bn" x="28" y="35" width="5" height="19" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--fn" x="56" y="33" width="5" height="21" rx="2.5"/>
+                  <rect class="horse__leg horse__leg--ff" x="64" y="32" width="5" height="22" rx="2.5"/>
+                  <path d="M15,28 C13,21 20,14 30,13 C42,11 58,14 66,21 C70,25 69,32 65,35 C58,39 36,39 21,37 C15,35 14,31 15,28Z"/>
+                  <path d="M15,28 C16,23 19,22 21,25 C22,29 19,33 15,31Z"/>
+                  <path d="M66,21 C70,15 71,9 68,6 C66,4 62,5 61,8 C60,11 61,18 63,21Z"/>
+                  <path d="M68,6 C71,4 77,5 79,10 C81,14 79,21 75,22 C71,23 68,20 68,14Z"/>
+                  <path d="M69,6 C71,2 75,4 73,7Z"/>
+                  <path d="M66,7 C68,4 71,5 70,9 C69,11 66,11 66,8Z" fill="white" fill-opacity="0.2"/>
+                  <path d="M30,13 C42,11 58,14 66,21 C58,18 42,13 30,16Z" fill="white" fill-opacity="0.12"/>
+                  <rect x="40" y="13" width="14" height="8" rx="2" fill="white" fill-opacity="0.32"/>
+                  <circle cx="50" cy="11" r="3.5" fill="white" fill-opacity="0.35"/>
+                  <circle cx="73" cy="13" r="2" fill="black" fill-opacity="0.4"/>
+                  <ellipse cx="78" cy="18" rx="1.2" ry="1.8" fill="black" fill-opacity="0.25"/>
+                  <rect x="19" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="28" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="56" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                  <rect x="64" y="50" width="5" height="4" rx="2" fill="black" fill-opacity="0.3"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Finish line: checkerboard stripe with CSS-only post extensions -->
+          <div class="finish-line" aria-label="Finish line"></div>
+
+        </div><!-- /.track__surface -->
+
+        <!-- Bottom outer rail -->
+        <div class="track__rail track__rail--bottom"></div>
+
+      </div><!-- /.track -->
+
+    </div><!-- /.race-stage -->
 
     <!-- Countdown overlay -->
     <div id="countdown-overlay" class="countdown-overlay countdown-overlay--hidden" aria-live="polite">
@@ -213,9 +427,15 @@
     <div class="results-overlay__backdrop"></div>
     <div class="results-overlay__content">
       <div class="results__winner-banner">
-        <span class="results__winner-label">WINNER</span>
-        <h2 class="results__winner-name" id="winner-name">&mdash;</h2>
-        <span class="results__winner-time" id="winner-time"></span>
+        <span class="results__winner-label">&#x1F3C6;&nbsp;WINNER</span>
+        <div class="results__winner-meta">
+          <span class="results__winner-num" id="winner-num">#1</span>
+          <h2 class="results__winner-name" id="winner-name">&mdash;</h2>
+        </div>
+        <div class="results__winner-detail">
+          <span class="results__winner-time" id="winner-time"></span>
+          <span class="results__winner-odds" id="winner-odds"></span>
+        </div>
       </div>
       <ol class="results__order" id="results-order" aria-label="Finishing order"></ol>
       <button id="race-again-btn" class="btn btn--start" aria-label="Race again">

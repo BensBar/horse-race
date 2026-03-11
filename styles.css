@@ -15,17 +15,17 @@
   --gold:            #ffd700;
   --gold-dark:       #b8960f;
   --accent:          #e63946;
-  --grass-dark:      #1a4d1a;
-  --grass-light:     #2a6e2a;
-  --dirt:            #8b7355;
-  --dirt-dark:       #6b5540;
-  --dirt-light:      #a08868;
-  --rail-color:      #c0c0c0;
+  --grass-dark:      #183c18;
+  --grass-light:     #1e5020;
+  --dirt:            #9c8060;
+  --dirt-dark:       #7a6045;
+  --dirt-light:      #b09070;
+  --rail-color:      #d0d0d0;
+  --stage-bg:        #06080f;
 
   /* Sizing */
-  --lane-h:          clamp(50px, 8vw, 80px);
-  --horse-w:         clamp(36px, 5vw, 56px);
-  --horse-h:         clamp(24px, 3.5vw, 38px);
+  --lane-h:          clamp(54px, 9vw, 84px);
+  --horse-w:         clamp(44px, 6.5vw, 70px);
   --badge-size:      clamp(22px, 3vw, 36px);
   --bar-h:           clamp(36px, 5vw, 56px);
   --finish-pos:      92%;
@@ -122,7 +122,6 @@ ol, ul { list-style: none; }
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 .horse-card:active { transform: scale(.97); }
-/* Staggered entrance */
 .horse-card:nth-child(1) { animation-delay: .05s; }
 .horse-card:nth-child(2) { animation-delay: .10s; }
 .horse-card:nth-child(3) { animation-delay: .15s; }
@@ -185,7 +184,7 @@ ol, ul { list-style: none; }
    RACE SCREEN
    ══════════════════════════════════════════════════════════════════════ */
 #race-screen {
-  background: var(--bg-primary);
+  background: var(--stage-bg);
   z-index: 5;
 }
 
@@ -193,13 +192,14 @@ ol, ul { list-style: none; }
 .broadcast-bar {
   flex-shrink: 0;
   height: var(--bar-h);
-  background: linear-gradient(180deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.7) 100%);
-  border-bottom: 2px solid rgba(255,215,0,.25);
+  background: linear-gradient(180deg, rgba(0,0,0,.92) 0%, rgba(0,0,0,.78) 100%);
+  border-bottom: 2px solid rgba(255,215,0,.3);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 clamp(.6rem, 2vw, 1.5rem);
   font-size: clamp(.6rem, 1.5vw, .9rem);
   letter-spacing: .06em;
   z-index: 20;
+  box-shadow: 0 2px 12px rgba(0,0,0,.5);
 }
 .broadcast-bar__left, .broadcast-bar__right {
   display: flex; align-items: center; gap: .5rem;
@@ -220,41 +220,120 @@ ol, ul { list-style: none; }
 .broadcast-bar__leader-label { color: var(--text-muted); font-weight: 600; }
 .broadcast-bar__leader-name  { font-weight: 800; color: #fff; }
 
+/* Leader change flash — class added/removed by JS */
+@keyframes leaderFlash {
+  0%   { color: var(--gold); transform: scale(1.18); }
+  100% { color: #fff;        transform: scale(1); }
+}
+.leader-change { animation: leaderFlash 0.55s ease-out forwards; }
+
+/* Final furlong state — class toggled by JS when race >= 70% complete */
+#race-screen.final-furlong .broadcast-bar {
+  border-bottom-color: rgba(255, 100, 0, .5);
+}
+#race-screen.final-furlong .broadcast-bar__timer {
+  color: #ff9800;
+  animation: finalFlicker 0.8s ease-in-out infinite;
+}
+@keyframes finalFlicker {
+  0%, 100% { opacity: 1; }
+  45%      { opacity: .75; }
+}
+
+/* ── Race Stage: outer frame that grounds the track visually ───────────── */
+.race-stage {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* Deep shadow inset gives the track a sunken-arena feel */
+  box-shadow:
+    inset 0 6px 24px rgba(0,0,0,.7),
+    inset 0 -6px 24px rgba(0,0,0,.5);
+  background: var(--stage-bg);
+  position: relative;
+}
+
 /* ── Track ─────────────────────────────────────────────────────────────── */
 .track {
   flex: 1; display: flex; flex-direction: column;
   position: relative; overflow: hidden;
   min-height: 0;
 }
-/* Crowd area */
-.track__crowd {
-  flex-shrink: 0;
-  height: clamp(20px, 4vw, 50px);
-  background:
-    repeating-linear-gradient(90deg,
-      rgba(255,255,255,.04) 0px, rgba(255,255,255,.04) 2px,
-      transparent 2px, transparent 6px),
-    linear-gradient(180deg, #0d0d1a 0%, #1a2030 100%);
-}
-/* Rails */
-.track__rail {
-  flex-shrink: 0; height: 6px;
-  background: linear-gradient(90deg,
-    var(--rail-color) 0%, #e8e8e8 40%, var(--rail-color) 100%);
-  box-shadow: 0 1px 4px rgba(0,0,0,.5);
-}
-.track__rail--top { border-bottom: 1px solid rgba(255,255,255,.15); }
-.track__rail--bottom { border-top: 1px solid rgba(255,255,255,.15); }
 
-/* Track surface */
+/* ── Grandstand / crowd backdrop ───────────────────────────────────────── */
+.track__grandstand {
+  flex-shrink: 0;
+  height: clamp(32px, 6.5vw, 72px);
+  position: relative;
+  overflow: hidden;
+  /*
+    Three-layer background:
+    1. Crowd head dots (radial gradients tiled at offsets)
+    2. Bleacher row lines (repeating horizontal stripes)
+    3. Deep stadium atmosphere gradient
+  */
+  background:
+    radial-gradient(circle, rgba(230,210,180,.22) 1.5px, transparent 1.5px),
+    radial-gradient(circle, rgba(200,175,150,.16) 1.5px, transparent 1.5px),
+    radial-gradient(circle, rgba(210,185,160,.18) 1.5px, transparent 1.5px),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.025) 0px, rgba(255,255,255,.025) 2px,
+      transparent 2px, transparent 14px
+    ),
+    linear-gradient(180deg, #04060c 0%, #0a1020 55%, #121a30 100%);
+  background-size:
+    24px 18px,
+    34px 22px,
+    28px 16px,
+    100% 100%,
+    100% 100%;
+  background-position:
+    3px 5px,
+    14px 2px,
+    22px 9px,
+    0 0,
+    0 0;
+}
+/* Stadium flood-light glow from above */
+.track__grandstand-lights {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 30% 0%, rgba(255,230,160,.07) 0%, transparent 60%),
+              radial-gradient(ellipse at 70% 0%, rgba(255,230,160,.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ── Rails ─────────────────────────────────────────────────────────────── */
+.track__rail {
+  flex-shrink: 0;
+  height: 7px;
+  background: linear-gradient(90deg,
+    #a0a0a8 0%, var(--rail-color) 20%, #e8e8ea 50%, var(--rail-color) 80%, #a0a0a8 100%);
+  position: relative;
+  z-index: 6;
+}
+.track__rail--top {
+  border-bottom: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 3px 8px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.12);
+}
+.track__rail--bottom {
+  border-top: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 -3px 8px rgba(0,0,0,.7), 0 -1px 0 rgba(255,255,255,.12);
+}
+
+/* ── Track surface (the dirt racing strip) ──────────────────────────────── */
 .track__surface {
   flex: 1; position: relative;
-  background:
-    repeating-linear-gradient(90deg,
-      transparent 0px, transparent 60px,
-      rgba(0,0,0,.03) 60px, rgba(0,0,0,.03) 62px),
-    linear-gradient(180deg, var(--grass-dark) 0%, var(--grass-light) 50%, var(--grass-dark) 100%);
+  /*
+    Turf median visible between rails. Lanes sit on top of this with their
+    own dirt background, so only a sliver of grass may show at edges.
+  */
+  background: linear-gradient(180deg, var(--grass-dark) 0%, var(--grass-light) 50%, var(--grass-dark) 100%);
   display: flex; flex-direction: column;
+  /* Subtle inset shadow adds depth under the top rail */
+  box-shadow: inset 0 4px 10px rgba(0,0,0,.45), inset 0 -4px 10px rgba(0,0,0,.3);
 }
 
 /* ── Lane ──────────────────────────────────────────────────────────────── */
@@ -262,17 +341,37 @@ ol, ul { list-style: none; }
   flex: 1; position: relative;
   display: flex; align-items: center;
   min-height: var(--lane-h);
+  /*
+    Dirt texture: alternating tonal gradient + subtle hoofprint-dot pattern.
+    Uses CSS radial-gradient tiles to mimic churned dirt.
+  */
   background:
-    linear-gradient(180deg,
-      var(--dirt) 0%, var(--dirt-light) 50%, var(--dirt) 100%);
-  border-bottom: 1px solid rgba(0,0,0,.25);
+    radial-gradient(circle, rgba(0,0,0,.12) 1px, transparent 1px),
+    linear-gradient(180deg, var(--dirt-dark) 0%, var(--dirt) 45%, var(--dirt-light) 55%, var(--dirt) 100%);
+  background-size: 28px 16px, 100% 100%;
+  background-position: 0 8px, 0 0;
+  /* Thin lane separator line */
+  border-bottom: 1px solid rgba(0,0,0,.35);
   padding-left: clamp(.4rem, 1vw, .8rem);
   container-type: inline-size;
+  /* Inner shadow at bottom of lane adds depth */
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,.25);
 }
 .lane:nth-child(odd) {
   background:
-    linear-gradient(180deg,
-      var(--dirt-dark) 0%, var(--dirt) 50%, var(--dirt-dark) 100%);
+    radial-gradient(circle, rgba(0,0,0,.10) 1px, transparent 1px),
+    linear-gradient(180deg, var(--dirt) 0%, var(--dirt-light) 45%, var(--dirt) 55%, var(--dirt-dark) 100%);
+  background-size: 28px 16px, 100% 100%;
+  background-position: 14px 4px, 0 0;
+}
+/* Top highlight stripe on each lane for lit-from-above effect */
+.lane::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.06) 30%, rgba(255,255,255,.06) 70%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Lane number badge */
@@ -286,122 +385,154 @@ ol, ul { list-style: none; }
   font-size: clamp(.6rem, 1.4vw, .9rem);
   display: grid; place-items: center;
   text-shadow: 0 1px 2px rgba(0,0,0,.5);
-  box-shadow: 0 2px 6px rgba(0,0,0,.4);
+  box-shadow: 0 2px 6px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.2);
 }
 
 /* ── Horse element ─────────────────────────────────────────────────────── */
 .lane__horse {
   position: absolute;
   left: calc(var(--badge-size) + clamp(.4rem, 1vw, .8rem) + 4px);
-  transform: translateX(calc(var(--horse-x, 0) * 1cqw));
+  /* Horizontal position driven by --horse-x (set by JS), vertical centred in lane */
+  top: 50%;
+  transform: translate(calc(var(--horse-x, 0) * 1cqw), -50%);
   will-change: transform;
-  display: flex; flex-direction: column; align-items: center;
+  display: flex; flex-direction: column; align-items: flex-start;
   z-index: 6;
-}
-.horse__name-label {
-  font-size: clamp(.45rem, 1vw, .7rem);
-  font-weight: 700; color: #fff;
-  text-shadow: 0 1px 3px rgba(0,0,0,.8);
-  white-space: nowrap;
-  margin-bottom: 1px;
-  opacity: .9;
-}
-.horse__body {
-  width: var(--horse-w); height: var(--horse-h);
-  border-radius: 30% 50% 18% 25%;
-  background:
-    linear-gradient(160deg, rgba(255,255,255,.15) 0%, transparent 50%, rgba(0,0,0,.1) 100%),
-    var(--horse-color, #888);
-  box-shadow:
-    inset 0 -3px 0 rgba(0,0,0,.3),
-    inset 0 2px 0 rgba(255,255,255,.2),
-    0 3px 8px rgba(0,0,0,.5);
-  position: relative;
-  overflow: visible;
-}
-/* Horse head and neck */
-.horse__body::before {
-  content: '';
-  position: absolute;
-  right: -22%;
-  top: -40%;
-  width: 38%;
-  height: 72%;
-  background:
-    linear-gradient(140deg, rgba(255,255,255,.12) 0%, transparent 60%),
-    var(--horse-color, #888);
-  border-radius: 35% 60% 45% 20%;
-  transform: rotate(-12deg);
-  box-shadow:
-    inset 0 1px 0 rgba(255,255,255,.15),
-    1px -1px 3px rgba(0,0,0,.3);
-}
-/* Jockey silks accent on body */
-.horse__body::after {
-  content: '';
-  position: absolute;
-  top: 15%; left: 25%; width: 35%; height: 45%;
-  background: rgba(255,255,255,.22);
-  border-radius: 50%;
+  /* currentColor is inherited by SVG fill="currentColor" paths */
+  color: var(--horse-color, #888);
 }
 
-/* Galloping animation */
-.lane__horse.running .horse__body {
-  animation: gallop .35s ease-in-out infinite;
+.horse__name-label {
+  font-size: clamp(.45rem, 1vw, .68rem);
+  font-weight: 700; color: #fff;
+  text-shadow: 0 1px 4px rgba(0,0,0,.9), 0 0 8px rgba(0,0,0,.6);
+  white-space: nowrap;
+  margin-bottom: 1px;
+  line-height: 1;
 }
-@keyframes gallop {
-  0%   { transform: translateY(0) rotate(0deg); }
-  30%  { transform: translateY(-4px) rotate(-1.5deg) scaleY(.96); }
-  60%  { transform: translateY(-2px) rotate(1deg); }
-  100% { transform: translateY(0) rotate(0deg); }
+
+/* .horse__body is now a transparent wrapper that holds the SVG */
+.horse__body {
+  display: block;
+  line-height: 0; /* collapse whitespace around inline SVG */
 }
-/* Speed burst effect */
-.lane__horse.bursting .horse__body {
-  animation: gallop .24s ease-in-out infinite;
-  box-shadow:
-    inset 0 -3px 0 rgba(0,0,0,.3),
-    inset 0 2px 0 rgba(255,255,255,.2),
-    0 3px 8px rgba(0,0,0,.5),
-    0 0 14px rgba(255,255,255,.35);
+
+/* ── Horse SVG ─────────────────────────────────────────────────────────── */
+.horse__svg {
+  display: block;
+  width: var(--horse-w);
+  height: auto;
+  /* drop-shadow uses the horse color at low opacity for a grounded look */
+  filter: drop-shadow(0 3px 5px rgba(0,0,0,.6));
+  overflow: visible;
 }
-/* Winner glow */
-.lane__horse.winner .horse__body {
+
+/* ── Gallop animation: whole SVG bobs; individual legs swing ───────────── */
+
+/* Base: no animation when idle */
+.horse__leg {
+  transform-box: fill-box;
+  transform-origin: top center;
+}
+
+/* Running state */
+.lane__horse.running .horse__svg {
+  animation: gallopBob 0.38s ease-in-out infinite;
+}
+.lane__horse.running .horse__leg--ff { animation: legFF 0.38s ease-in-out infinite; }
+.lane__horse.running .horse__leg--fn { animation: legFN 0.38s ease-in-out infinite 0.19s; }
+.lane__horse.running .horse__leg--bf { animation: legBF 0.38s ease-in-out infinite 0.10s; }
+.lane__horse.running .horse__leg--bn { animation: legBN 0.38s ease-in-out infinite 0.28s; }
+
+@keyframes gallopBob {
+  0%   { transform: translateY(0)    rotate(0deg); }
+  35%  { transform: translateY(-4px) rotate(-1.2deg); }
+  65%  { transform: translateY(-2px) rotate(.8deg); }
+  100% { transform: translateY(0)    rotate(0deg); }
+}
+/* Diagonal pair gait: ff+bn lead, fn+bf trail */
+@keyframes legFF { 0%,100%{ transform: rotate(-16deg); } 50%{ transform: rotate(22deg); } }
+@keyframes legFN { 0%,100%{ transform: rotate(13deg);  } 50%{ transform: rotate(-22deg); } }
+@keyframes legBF { 0%,100%{ transform: rotate(18deg);  } 50%{ transform: rotate(-14deg); } }
+@keyframes legBN { 0%,100%{ transform: rotate(-13deg); } 50%{ transform: rotate(20deg); } }
+
+/* Speed burst: faster cadence + energy glow */
+.lane__horse.bursting .horse__svg {
+  animation: gallopBob 0.24s ease-in-out infinite;
+  filter:
+    drop-shadow(0 3px 5px rgba(0,0,0,.6))
+    drop-shadow(0 0 10px rgba(255,255,255,.3));
+}
+.lane__horse.bursting .horse__leg--ff { animation: legFF 0.24s ease-in-out infinite; }
+.lane__horse.bursting .horse__leg--fn { animation: legFN 0.24s ease-in-out infinite 0.12s; }
+.lane__horse.bursting .horse__leg--bf { animation: legBF 0.24s ease-in-out infinite 0.06s; }
+.lane__horse.bursting .horse__leg--bn { animation: legBN 0.24s ease-in-out infinite 0.18s; }
+
+/* Winner: gold pulse glow */
+.lane__horse.winner .horse__svg {
   animation: winnerPulse 1s ease-in-out infinite;
+  filter: drop-shadow(0 0 8px rgba(255,215,0,.7)) drop-shadow(0 3px 5px rgba(0,0,0,.5));
 }
 @keyframes winnerPulse {
-  0%, 100% { box-shadow: 0 0 10px rgba(255,215,0,.5), 0 0 30px rgba(255,215,0,.2); }
-  50%      { box-shadow: 0 0 20px rgba(255,215,0,.8), 0 0 50px rgba(255,215,0,.4); }
+  0%, 100% { filter: drop-shadow(0 0 6px rgba(255,215,0,.6))  drop-shadow(0 3px 5px rgba(0,0,0,.5)); }
+  50%      { filter: drop-shadow(0 0 18px rgba(255,215,0,.9)) drop-shadow(0 3px 8px rgba(0,0,0,.5)); }
 }
 
 /* ── Finish line ───────────────────────────────────────────────────────── */
 .finish-line {
   position: absolute;
-  top: 0; bottom: 0;
+  /* Extend slightly outside the surface to overlap rails */
+  top: -7px; bottom: -7px;
   left: var(--finish-pos);
-  width: clamp(10px, 1.5vw, 20px);
+  width: clamp(12px, 1.8vw, 22px);
   background-image: repeating-conic-gradient(#000 0% 25%, #fff 25% 50%);
-  background-size: 10px 10px;
+  background-size: 11px 11px;
   z-index: 4;
-  box-shadow: 0 0 12px rgba(255,255,255,.35);
+  box-shadow: -3px 0 12px rgba(255,255,255,.25), 3px 0 8px rgba(0,0,0,.4);
+}
+/* Top post */
+.finish-line::before {
+  content: '';
+  position: absolute;
+  top: -16px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 16px;
+  background: linear-gradient(180deg, #fff 0%, #ccc 100%);
+  border-radius: 2px 2px 0 0;
+  box-shadow: 0 -2px 6px rgba(255,255,255,.45);
+}
+/* Bottom post */
+.finish-line::after {
+  content: '';
+  position: absolute;
+  bottom: -16px; left: 50%;
+  transform: translateX(-50%);
+  width: 4px; height: 16px;
+  background: linear-gradient(0deg, #fff 0%, #ccc 100%);
+  border-radius: 0 0 2px 2px;
+  box-shadow: 0 2px 6px rgba(255,255,255,.45);
 }
 
 /* ── Countdown overlay ─────────────────────────────────────────────────── */
 .countdown-overlay {
   position: fixed; inset: 0;
   display: grid; place-items: center;
-  background: rgba(0,0,0,.6);
+  background: rgba(0,0,0,.65);
   z-index: 50;
   transition: opacity var(--transition-fast);
 }
 .countdown-overlay--hidden { opacity: 0; visibility: hidden; pointer-events: none; }
 .countdown-overlay__text {
-  font-size: clamp(4rem, 15vw, 12rem);
+  font-size: clamp(4rem, 18vw, 14rem);
   font-weight: 900; color: var(--gold);
-  text-shadow: 0 0 40px rgba(255,215,0,.5);
-  animation: countPop .4s ease-out;
+  text-shadow:
+    0 0 40px rgba(255,215,0,.55),
+    0 4px 0 var(--gold-dark);
+  animation: countPop .42s cubic-bezier(.22,1,.36,1);
+  letter-spacing: -.02em;
 }
 @keyframes countPop {
-  0%   { transform: scale(1.6); opacity: 0; }
+  0%   { transform: scale(1.8); opacity: 0; }
   100% { transform: scale(1);   opacity: 1; }
 }
 
@@ -409,20 +540,23 @@ ol, ul { list-style: none; }
 .standings {
   position: absolute; right: 0; top: var(--bar-h);
   width: clamp(130px, 18vw, 220px);
-  background: rgba(0,0,0,.7);
-  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-  border-left: 1px solid rgba(255,255,255,.08);
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  border-left: 1px solid rgba(255,255,255,.09);
+  border-bottom: 1px solid rgba(255,255,255,.06);
+  border-bottom-left-radius: 6px;
   padding: clamp(.4rem, 1vw, .8rem);
   z-index: 15;
-  transform: translateX(0);
-  transition: transform var(--transition-med) ease;
 }
 .standings__title {
   font-size: clamp(.55rem, 1.2vw, .8rem);
   font-weight: 800; color: var(--gold);
-  letter-spacing: .12em;
-  margin-bottom: .4rem;
+  letter-spacing: .14em;
+  margin-bottom: .5rem;
   text-align: center;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(255,215,0,.15);
+  padding-bottom: .3rem;
 }
 .standings__list { display: flex; flex-direction: column; gap: 2px; }
 .standings__item {
@@ -430,10 +564,13 @@ ol, ul { list-style: none; }
   padding: clamp(.15rem, .4vw, .3rem) clamp(.25rem, .6vw, .4rem);
   border-radius: 4px;
   background: rgba(255,255,255,.04);
-  transition: transform var(--transition-fast), background var(--transition-fast);
+  transition: background var(--transition-fast);
   font-size: clamp(.55rem, 1.2vw, .8rem);
 }
-.standings__item[data-standing="1"] { background: rgba(255,215,0,.12); }
+.standings__item[data-standing="1"] {
+  background: rgba(255,215,0,.13);
+  box-shadow: inset 0 0 0 1px rgba(255,215,0,.1);
+}
 .standings__pos {
   width: 1.4em; text-align: center;
   font-weight: 800; color: var(--text-muted);
@@ -455,7 +592,7 @@ ol, ul { list-style: none; }
 .btn--icon {
   width: clamp(32px, 5vw, 44px); height: clamp(32px, 5vw, 44px);
   border-radius: 8px;
-  background: rgba(0,0,0,.6);
+  background: rgba(0,0,0,.65);
   backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
   font-size: clamp(.9rem, 2vw, 1.3rem);
   display: grid; place-items: center;
@@ -473,20 +610,27 @@ ol, ul { list-style: none; }
 }
 .results-overlay__backdrop {
   position: absolute; inset: 0;
-  background: rgba(0,0,0,.75);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  background: rgba(0,0,0,.78);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
 .results-overlay__content {
   position: relative; z-index: 1;
   display: flex; flex-direction: column; align-items: center;
   gap: clamp(1rem, 3vw, 2rem);
   padding: clamp(1.5rem, 4vw, 3rem);
-  max-width: 500px; width: 90%;
+  max-width: 520px; width: 92%;
 }
 
 /* Winner banner */
 .results__winner-banner {
   text-align: center;
+  padding: clamp(.8rem, 2vw, 1.4rem) clamp(1.2rem, 3vw, 2.2rem);
+  background: rgba(255,215,0,.07);
+  border: 1px solid rgba(255,215,0,.2);
+  border-radius: 12px;
+  width: 100%;
+  /* Color accent border set inline by JS via --winner-color */
+  border-top: 3px solid var(--winner-color, var(--gold));
 }
 .results__winner-label {
   display: block;
@@ -494,25 +638,44 @@ ol, ul { list-style: none; }
   font-weight: 800; letter-spacing: .2em;
   color: var(--text-muted);
   text-transform: uppercase;
+  margin-bottom: .4rem;
+}
+.results__winner-meta {
+  display: flex; align-items: center; justify-content: center; gap: .6rem;
+}
+.results__winner-num {
+  font-size: clamp(1rem, 3vw, 1.8rem);
+  font-weight: 900; color: var(--winner-color, var(--gold));
+  opacity: .85;
 }
 .results__winner-name {
-  font-size: clamp(1.6rem, 6vw, 3.5rem);
+  font-size: clamp(1.5rem, 5.5vw, 3.2rem);
   font-weight: 900; color: var(--gold);
   text-shadow: 0 0 30px rgba(255,215,0,.4);
   animation: winnerGlow 2s ease-in-out infinite;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 @keyframes winnerGlow {
   0%, 100% { text-shadow: 0 0 30px rgba(255,215,0,.4); }
-  50%      { text-shadow: 0 0 50px rgba(255,215,0,.7), 0 0 80px rgba(255,215,0,.3); }
+  50%      { text-shadow: 0 0 55px rgba(255,215,0,.75), 0 0 90px rgba(255,215,0,.3); }
+}
+.results__winner-detail {
+  display: flex; align-items: center; justify-content: center; gap: .8rem;
+  margin-top: .3rem;
 }
 .results__winner-time {
   font-size: clamp(.7rem, 1.5vw, 1rem);
   color: var(--text-muted); font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+.results__winner-odds {
+  font-size: clamp(.65rem, 1.4vw, .9rem);
+  color: var(--gold); font-weight: 700;
+  background: rgba(255,215,0,.1);
+  padding: .1em .45em; border-radius: 4px;
+}
 
-/* Finishing order */
+/* Finishing order list */
 .results__order {
   width: 100%;
   display: flex; flex-direction: column; gap: 4px;
@@ -525,7 +688,10 @@ ol, ul { list-style: none; }
   font-size: clamp(.7rem, 1.6vw, .95rem);
   opacity: 0; animation: resultIn var(--transition-med) ease forwards;
 }
-.results__order-item:first-child { background: rgba(255,215,0,.12); }
+.results__order-item:first-child {
+  background: rgba(255,215,0,.1);
+  border: 1px solid rgba(255,215,0,.18);
+}
 .results__order-pos {
   width: 1.6em; font-weight: 800; color: var(--text-muted); text-align: center;
 }
@@ -540,31 +706,70 @@ ol, ul { list-style: none; }
 }
 
 @keyframes resultIn {
-  from { opacity: 0; transform: translateX(20px); }
+  from { opacity: 0; transform: translateX(22px); }
   to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Confetti ──────────────────────────────────────────────────────────── */
+.confetti-container {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 100;
+  overflow: hidden;
+}
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  animation: confettiFall linear forwards;
+  will-change: transform, opacity;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(0)       rotate(0deg)   scaleX(1);   opacity: 1; }
+  70%  { opacity: 1; }
+  100% { transform: translateY(105vh)   rotate(680deg) scaleX(.6);  opacity: 0; }
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────── */
 
-/* Mobile compact */
+/* Mobile compact (< 768px) */
 @media (max-width: 767px) {
   .standings {
     position: fixed; bottom: 0; left: 0; right: 0; top: auto;
     width: 100%; height: auto;
     border-left: none; border-top: 1px solid rgba(255,255,255,.08);
-    transform: translateY(0);
+    border-bottom-left-radius: 0;
     display: flex; flex-wrap: wrap; align-items: center;
     gap: .2rem; padding: .3rem .5rem;
   }
   .standings__title { display: none; }
-  .standings__list { flex-direction: row; flex-wrap: wrap; gap: .2rem; width: 100%; }
-  .standings__item { flex: 0 0 auto; font-size: clamp(.5rem, 2.5vw, .7rem); }
-  .standings__name { max-width: 60px; }
+  .standings__list  { flex-direction: row; flex-wrap: wrap; gap: .2rem; width: 100%; }
+  .standings__item  { flex: 0 0 auto; font-size: clamp(.5rem, 2.5vw, .7rem); }
+  .standings__name  { max-width: 60px; }
   .controls { bottom: auto; top: calc(var(--bar-h) + .4rem); left: .4rem; }
   .horse__name-label { display: none; }
+  /* Tighten grandstand on small screens */
+  .track__grandstand { height: clamp(24px, 5vw, 48px); }
 }
 
 /* Large / 4K */
 @media (min-width: 2560px) {
   html { font-size: 22px; }
+}
+
+/* ── Reduced motion ────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .lane__horse.running .horse__svg,
+  .lane__horse.bursting .horse__svg,
+  .horse__leg,
+  .broadcast-bar__live,
+  .btn--start,
+  .results__winner-name,
+  .confetti-piece {
+    animation: none !important;
+  }
+  .lane__horse.winner .horse__svg {
+    filter: drop-shadow(0 0 10px rgba(255,215,0,.7));
+    animation: none !important;
+  }
 }
