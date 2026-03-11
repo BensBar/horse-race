@@ -227,7 +227,7 @@ ol, ul { list-style: none; }
 }
 .leader-change { animation: leaderFlash 0.55s ease-out forwards; }
 
-/* Final furlong state — class toggled by JS when race > 75% complete */
+/* Final furlong state — class toggled by JS when race >= 70% complete */
 #race-screen.final-furlong .broadcast-bar {
   border-bottom-color: rgba(255, 100, 0, .5);
 }

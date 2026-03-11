@@ -507,8 +507,8 @@ function raceLoop(timestamp) {
   updateLeader();
   updateStandings(horses);
 
-  // Final-furlong emphasis: fires once when the average position exceeds 70% of track
-  if (!finalFurlongFired && getAverageProgress() / RACE_CONFIG.finishLinePosition > 0.70) {
+  // Final-furlong emphasis: fires once when the average position reaches 70% of track
+  if (!finalFurlongFired && getAverageProgress() / RACE_CONFIG.finishLinePosition >= 0.70) {
     finalFurlongFired = true;
     dom.raceScreen.classList.add("final-furlong");
   }
@@ -779,7 +779,8 @@ function launchConfetti(heroColor) {
     container.appendChild(piece);
   }
 
-  // Auto-remove once the longest animation has finished
+  // Auto-remove once all animations have finished.
+  // Max piece duration = 1.6s + 1.6s = 3.2s; max delay = 0.9s → ceil at 5s.
   setTimeout(() => container.remove(), 5000);
 }
 
