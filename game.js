@@ -110,6 +110,8 @@ let lastFrameTime = 0;
 let elapsedTime = 0;
 let preSelectedWinner = null;
 let isMuted = false;
+let previousLeaderId = null;  // tracks who led last frame for change-flash
+let finalFurlongFired = false; // prevents repeated class toggles
 
 // =====================================================================
 // DOM REFERENCES
@@ -129,7 +131,10 @@ const dom = {
   countdownOverlay: document.getElementById("countdown-overlay"),
   countdownText:  document.getElementById("countdown-text"),
   winnerName:     document.getElementById("winner-name"),
+  winnerNum:      document.getElementById("winner-num"),
   winnerTime:     document.getElementById("winner-time"),
+  winnerOdds:     document.getElementById("winner-odds"),
+  winnerBanner:   document.querySelector(".results__winner-banner"),
   resultsOrder:   document.getElementById("results-order"),
 };
 
@@ -353,6 +358,8 @@ function initRace() {
   finishOrder = [];
   elapsedTime = 0;
   preSelectedWinner = null;
+  previousLeaderId = null;
+  finalFurlongFired = false;
 
   // Cancel any running animation
   if (animationFrameId) {
@@ -361,6 +368,12 @@ function initRace() {
   }
   SoundManager.stopHooves();
   SoundManager.stopCrowd();
+
+  // Remove any lingering state classes from previous race
+  dom.raceScreen.classList.remove("final-furlong");
+
+  // Remove any leftover confetti
+  document.querySelectorAll(".confetti-container").forEach((el) => el.remove());
 
   calculateOdds();
 
@@ -494,6 +507,12 @@ function raceLoop(timestamp) {
   updateLeader();
   updateStandings(horses);
 
+  // Final-furlong emphasis: fires once when the average position exceeds 70% of track
+  if (!finalFurlongFired && getAverageProgress() / RACE_CONFIG.finishLinePosition > 0.70) {
+    finalFurlongFired = true;
+    dom.raceScreen.classList.add("final-furlong");
+  }
+
   // Check if race is complete
   if (finishOrder.length >= RACE_CONFIG.numHorses) {
     endRace();
@@ -626,6 +645,13 @@ function updateLeader() {
   const sorted = [...horses].sort((a, b) => b.position - a.position);
   const leader = sorted[0];
   if (leader) {
+    if (previousLeaderId !== null && leader.id !== previousLeaderId) {
+      // New leader — animate the name to draw the viewer's eye
+      dom.leader.classList.remove("leader-change");
+      void dom.leader.offsetWidth; // force reflow so animation restarts
+      dom.leader.classList.add("leader-change");
+    }
+    previousLeaderId = leader.id;
     dom.leader.textContent = leader.name;
   } else if (finishOrder.length > 0) {
     dom.leader.textContent = finishOrder[0].name;
@@ -678,6 +704,9 @@ function endRace() {
   SoundManager.stopCrowd();
   SoundManager.playFanfare();
 
+  // Remove final-furlong urgency styling
+  dom.raceScreen.classList.remove("final-furlong");
+
   // Update final timer
   updateTimer();
 
@@ -689,8 +718,14 @@ function showResults() {
   const winner = finishOrder[0];
   if (!winner) return;
 
+  const winnerData = HORSE_DATA.find((h) => h.id === winner.id);
+
   dom.winnerName.textContent = winner.name;
   dom.winnerTime.textContent = formatTime(winner.finishTime);
+  if (dom.winnerNum)  dom.winnerNum.textContent  = "#" + winner.id;
+  if (dom.winnerOdds) dom.winnerOdds.textContent = winnerData?.oddsDisplay || "";
+  // Set the colour-accent CSS variable used by the winner banner border
+  if (dom.winnerBanner) dom.winnerBanner.style.setProperty("--winner-color", winner.color);
 
   // Build finishing order list
   dom.resultsOrder.innerHTML = "";
@@ -707,6 +742,45 @@ function showResults() {
   });
 
   dom.resultsOverlay.classList.remove("screen--hidden");
+
+  // Celebratory confetti — uses winner colour as the hero colour
+  launchConfetti(winner.color);
+}
+
+// =====================================================================
+// CONFETTI
+// =====================================================================
+
+/**
+ * Spawns a brief burst of CSS-animated confetti pieces.
+ * @param {string} heroColor - Winner's colour used as the dominant hue.
+ */
+function launchConfetti(heroColor) {
+  const palette = ["#FFD700", "#ffffff", "#ff6b6b", "#4fc3f7", "#a5d6a7", heroColor];
+  const container = document.createElement("div");
+  container.className = "confetti-container";
+  document.body.appendChild(container);
+
+  const PIECES = 90;
+  for (let i = 0; i < PIECES; i++) {
+    const piece = document.createElement("div");
+    piece.className = "confetti-piece";
+    const size = 5 + Math.random() * 7;
+    const isCircle = Math.random() > 0.45;
+    piece.style.cssText = [
+      "left:" + (Math.random() * 100) + "%",
+      "background:" + palette[Math.floor(Math.random() * palette.length)],
+      "width:" + size + "px",
+      "height:" + (isCircle ? size : size * 0.4 + 3) + "px",
+      "border-radius:" + (isCircle ? "50%" : "2px"),
+      "animation-delay:" + (Math.random() * 0.9) + "s",
+      "animation-duration:" + (1.6 + Math.random() * 1.6) + "s",
+    ].join(";");
+    container.appendChild(piece);
+  }
+
+  // Auto-remove once the longest animation has finished
+  setTimeout(() => container.remove(), 5000);
 }
 
 // =====================================================================
